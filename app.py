@@ -2,12 +2,8 @@ import json
 import data
 import datetime
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
-
-
-def json_to_res(data):
-    return json.dumps(data), 200, {'Content-Type': 'application/json; charset =utf-8'}
 
 
 app = Flask(__name__)
@@ -78,7 +74,7 @@ with app.app_context():
 @app.route('/users', methods=["GET", "POST"])
 def page_all_users():
     if request.method == "GET":
-        return json_to_res([user.to_dict() for user in User.query.all()])
+        return jsonify([user.to_dict() for user in User.query.all()])
     elif request.method == "POST":
         new_user = json.loads(request.data)
         db.session.add(User(**new_user))
@@ -92,7 +88,7 @@ def page_all_users():
 def user_page(pk):
     user = User.query.get(pk)
     if request.method == "GET":
-        return json_to_res(user.to_dict())
+        return jsonify(user.to_dict())
     elif request.method == "PUT":
         usr_data = json.loads(request.data)
         user.first_name = usr_data['first_name']
@@ -117,7 +113,7 @@ def page_all_orders():
             order.start_date = str(order.start_date)
             order.end_date = str(order.end_date)
             res.append(order.to_dict())
-        return json_to_res(res)
+        return jsonify(res)
     elif request.method == "POST":
         new_order = json.loads(request.data)
         db.session.add(Order(**new_order))
@@ -131,7 +127,7 @@ def order_page(pk):
     if request.method == "GET":
         order.start_date = str(order.start_date)
         order.end_date = str(order.end_date)
-        return json_to_res(order.to_dict())
+        return jsonify(order.to_dict())
     elif request.method == "PUT":
         ordr_data = json.loads(request.data)
         ordr_data['start_date'] = datetime.datetime.strptime(ordr_data['start_date'], '%Y-%m-%d').date()
@@ -155,7 +151,7 @@ def order_page(pk):
 @app.route('/offers', methods=["GET", "POST"])
 def page_all_offers():
     if request.method == "GET":
-        return json_to_res([offer.to_dict() for offer in Offer.query.all()])
+        return jsonify([offer.to_dict() for offer in Offer.query.all()])
     elif request.method == "POST":
         new_offer = json.loads(request.data)
         db.session.add(User(**new_offer))
@@ -167,7 +163,7 @@ def page_all_offers():
 def offer_page(pk):
     offer = Offer.query.get(pk)
     if request.method == "GET":
-        return json_to_res(offer.to_dict())
+        return jsonify(offer.to_dict())
     elif request.method == "PUT":
         offr_data = json.loads(request.data)
         offer.order_id = offr_data['order_id']
